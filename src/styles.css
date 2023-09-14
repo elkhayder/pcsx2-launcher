@@ -1,0 +1,17 @@
+/* Fonts */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   @apply bg-zinc-900 text-white antialiased;
+}
+
+.container {
+   @apply mx-auto px-4 max-w-7xl sm:px-6 lg:px-8;
+}
+
+:root {
+   scrollbar-gutter: stable both-edges;
+}
