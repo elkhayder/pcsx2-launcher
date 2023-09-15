@@ -37,13 +37,13 @@ watchEffect(() => {
       ref="buttonRef"
    >
       <div class="overflow-hidden bg-zinc-900 p-2">
-         <!-- <div class="relative"> -->
-         <img
-            :src="`https://raw.githubusercontent.com/xlenore/ps2-covers/main/covers/${game.serial}.jpg`"
-            alt="Game Cover"
-            class="w-full"
-         />
-         <!-- </div> -->
+         <div class="relative aspect-[16/23]">
+            <img
+               :src="`https://raw.githubusercontent.com/xlenore/ps2-covers/main/covers/${game.serial}.jpg`"
+               alt="Game Cover"
+               class="w-full"
+            />
+         </div>
 
          <h2 class="my-2 truncate">{{ game.name ?? "Unnamed" }}</h2>
          <h3 class="text-sm text-gray-400">
