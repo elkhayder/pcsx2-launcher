@@ -1,22 +1,41 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs::DirEntry;
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn read_iso_serial(iso_path: &str) -> Result<String, ()> {
+fn read_iso_serial(iso_path: &str) -> Result<String, String> {
     use iso9660::{DirectoryEntry, ISO9660};
     use std::fs::File;
     use std::io::Read;
 
-    let file = File::open(iso_path).unwrap();
-    let fs = ISO9660::new(file).unwrap();
+    let file = match File::open(iso_path) {
+        Ok(file) => file,
+        Err(_) => return Err(format!("Failed to open file {}", iso_path)),
+    };
+    let fs = match ISO9660::new(file) {
+        Ok(fs) => fs,
+        Err(_) => return Err(format!("Failed to read file {} as ISO9660", iso_path)),
+    };
 
-    match fs.open("SYSTEM.CNF").unwrap() {
-        Some(DirectoryEntry::File(file)) => {
+    match fs.open("SYSTEM.CNF") {
+        Ok(Some(DirectoryEntry::File(file))) => {
             let mut raw = Vec::new();
-            file.read().read_to_end(&mut raw).unwrap();
+            match file.read().read_to_end(&mut raw) {
+                Err(_) => return Err(format!("Failed to read {} SYSTEM.CNF content", iso_path)),
+                _ => {}
+            };
 
-            let config = String::from_utf8(raw).unwrap();
+            let config = match String::from_utf8(raw) {
+                Ok(config) => config,
+                Err(_) => {
+                    return Err(format!(
+                        "Failed to parse {} SYSTEM.CNF content as UTF-8",
+                        iso_path
+                    ))
+                }
+            };
 
             let serial = config.split("\\").collect::<Vec<_>>()[1]
                 .split(";")
@@ -26,7 +45,7 @@ fn read_iso_serial(iso_path: &str) -> Result<String, ()> {
 
             Ok(serial)
         }
-        _ => Err(()),
+        _ => Err(format!("{} SYSTEM.CNF is not found", iso_path)),
     }
 }
 
@@ -38,15 +57,17 @@ struct Game {
 }
 
 #[tauri::command]
-fn read_directory_games(path: &str) -> Result<Vec<Game>, ()> {
+fn read_directory_games(path: &str) -> Result<Vec<Game>, String> {
+    use walkdir::WalkDir;
+
     // Get all files that end with .iso in the directory
-    let mut iso_files = std::fs::read_dir(path)
-        .unwrap()
+    let mut iso_files = WalkDir::new(path)
+        .into_iter()
         .filter_map(|entry| {
-            let entry = entry.unwrap();
+            let entry = entry.ok()?;
             let path = entry.path();
-            if path.is_file() && path.extension().unwrap() == "iso" {
-                Some(path.to_str().unwrap().to_string())
+            if path.is_file() && path.extension()? == "iso" {
+                Some(path.to_str()?.to_string())
             } else {
                 None
             }
@@ -57,7 +78,7 @@ fn read_directory_games(path: &str) -> Result<Vec<Game>, ()> {
 
     // Read the serial from the iso
     for file in iso_files.iter_mut() {
-        let serial = read_iso_serial(file).unwrap();
+        let serial = read_iso_serial(file)?;
 
         games.push(Game {
             serial,
@@ -79,7 +100,7 @@ fn launch_game(pcsx2_path: &str, iso_path: &str) {
         .arg(iso_path)
         .arg("--fullscreen")
         .arg("--nogui")
-        .arg("--portable")
+        // .arg("--portable")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
