@@ -13,10 +13,11 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = [ "dialog-open"] }
+tauri = { version = "1.4", features = [ "dialog-message", "dialog-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 iso9660 = "0.1.1"
+walkdir = "2.4.0"
 
 
 [features]

@@ -14,6 +14,7 @@
       "dayjs": "^1.11.9",
       "gamepad-helper": "^1.2.1",
       "pinia": "^2.1.6",
+      "sass": "^1.67.0",
       "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#v1",
       "vue": "^3.3.4",
       "vue-router": "4"
