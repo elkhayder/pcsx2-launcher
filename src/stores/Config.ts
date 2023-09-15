@@ -3,7 +3,10 @@ import { onMounted, reactive, watchEffect } from "vue";
 
 export type Config = {
    folders: string[];
-   pcsx2Path: string | null;
+   pcsx2: {
+      path: string | null;
+      flags: string[];
+   };
 };
 
 export const useConfigStore = defineStore("config", () => {
@@ -11,7 +14,10 @@ export const useConfigStore = defineStore("config", () => {
 
    const config = reactive<Config>({
       folders: [],
-      pcsx2Path: null,
+      pcsx2: {
+         path: null,
+         flags: [],
+      },
    });
 
    onMounted(() => {

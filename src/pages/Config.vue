@@ -34,7 +34,7 @@ const updatePCSX2Location = async () => {
 
    if (!location) return;
 
-   config.value.pcsx2Path = location as string;
+   config.value.pcsx2.path = location as string;
 };
 </script>
 
@@ -76,7 +76,7 @@ const updatePCSX2Location = async () => {
             class="flex flex-row items-center mt-4 first-of-type:mt-0 px-4 py-4 bg-black border-2 border-gray-300 rounded-md"
          >
             <h6 class="flex-grow truncate">
-               {{ config.pcsx2Path ?? "-" }}
+               {{ config.pcsx2.path ?? "-" }}
             </h6>
             <button
                class="px-4 py-2 font-bold text-white bg-red-600 rounded-md"
