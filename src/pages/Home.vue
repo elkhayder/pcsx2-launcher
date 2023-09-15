@@ -7,7 +7,8 @@ const gamesStore = useGamesStore();
 
 <template>
    <div class="flex justify-between items-center my-6">
-      <h1 class="text-4xl font-bold">Games</h1>
+      <h1 class="text-4xl font-bold">Games ({{ gamesStore.games.length }})</h1>
+
       <button title="Refresh" @click="gamesStore.scan">
          <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -22,12 +23,28 @@ const gamesStore = useGamesStore();
          </svg>
       </button>
    </div>
-
+   <div class="flex items-center flex-1 my-4 gap-6">
+      <div>
+         <label for="search_input">Search:</label>
+         <input
+            id="search_input"
+            placeholder="Search..."
+            v-model="gamesStore.searchKeyword"
+         />
+      </div>
+      <div>
+         <label for="order_by">Order by:</label>
+         <select id="order_by" v-model="gamesStore.orderBy">
+            <option value="lastPlayed">Last played</option>
+            <option value="name">Name</option>
+         </select>
+      </div>
+   </div>
    <div
       class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 items-start gap-4 -mx-2"
    >
       <GameCard
-         v-for="(game, index) of gamesStore.games"
+         v-for="(game, index) of gamesStore.filteredGames"
          :key="game.serial"
          :game="game"
          :index="index"
@@ -35,4 +52,13 @@ const gamesStore = useGamesStore();
    </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+label {
+   @apply block mb-2 text-sm font-medium text-white;
+}
+
+input,
+select {
+   @apply bg-gray-50 border text-sm rounded-lg block w-full px-2.5 py-1.5 dark:bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500;
+}
+</style>
