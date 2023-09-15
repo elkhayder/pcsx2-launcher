@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { open } from "@tauri-apps/api/dialog";
 import { useConfigStore } from "../stores/Config";
+import { computed } from "vue";
 
 const configStore = useConfigStore();
+
+const config = computed(() => configStore.config);
 
 const addFolder = async () => {
    const folder = await open({
@@ -10,8 +13,12 @@ const addFolder = async () => {
    });
 
    if (folder) {
-      configStore.addFolder(folder as string);
+      config.value.folders.push(folder as string);
    }
+};
+
+const removeFolder = (folder: string) => {
+   config.value.folders = config.value.folders.filter((f) => f !== folder);
 };
 
 const updatePCSX2Location = async () => {
@@ -27,7 +34,7 @@ const updatePCSX2Location = async () => {
 
    if (!location) return;
 
-   configStore.updatePCSX2Path(location as string);
+   config.value.pcsx2Path = location as string;
 };
 </script>
 
@@ -48,13 +55,13 @@ const updatePCSX2Location = async () => {
       <div class="flex flex-col mt-4">
          <div
             class="flex flex-row items-center mt-4 first-of-type:mt-0 px-4 py-4 bg-black border-2 border-gray-300 rounded-md"
-            v-for="(folder, index) in configStore.folders"
+            v-for="(folder, index) in config.folders"
             :key="index"
          >
             <h6 class="flex-grow truncate">{{ folder }}</h6>
             <button
                class="px-4 py-2 font-bold text-white bg-red-600 rounded-md"
-               @click="() => configStore.removeFolder(folder)"
+               @click="() => removeFolder(folder)"
             >
                Remove
             </button>
@@ -69,7 +76,7 @@ const updatePCSX2Location = async () => {
             class="flex flex-row items-center mt-4 first-of-type:mt-0 px-4 py-4 bg-black border-2 border-gray-300 rounded-md"
          >
             <h6 class="flex-grow truncate">
-               {{ configStore.pcsx2Path ?? "-" }}
+               {{ config.pcsx2Path ?? "-" }}
             </h6>
             <button
                class="px-4 py-2 font-bold text-white bg-red-600 rounded-md"

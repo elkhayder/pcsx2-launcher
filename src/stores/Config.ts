@@ -1,44 +1,43 @@
 import { defineStore } from "pinia";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, watchEffect } from "vue";
+
+export type Config = {
+   folders: string[];
+   pcsx2Path: string | null;
+};
 
 export const useConfigStore = defineStore("config", () => {
-   const PREFIX = "config_";
+   const LOCALSTORAGE_KEY = "config";
 
-   const folders = ref<string[]>([]);
-   const pcsx2Path = ref<string | null>(null);
+   const config = reactive<Config>({
+      folders: [],
+      pcsx2Path: null,
+   });
 
    onMounted(() => {
       console.log("Config store Mounted");
 
-      if (localStorage.getItem(PREFIX + "folders") == null) {
-         localStorage.setItem(PREFIX + "folders", JSON.stringify([]));
+      // Populate config from localStorage
+      if (!localStorage.getItem(LOCALSTORAGE_KEY)) {
+         localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(config));
       } else {
-         folders.value = JSON.parse(localStorage.getItem(PREFIX + "folders")!);
+         console.log("Config store loaded from localStorage");
+         Object.assign(
+            config,
+            JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY)!)
+         );
       }
 
-      pcsx2Path.value = localStorage.getItem(PREFIX + "pcsx2_path");
+      // Watch for changes and update localStorage
+      // This is initiated here instead of in the reactive declaration
+      // because we don't want to trigger a write to localStorage on
+      // initialization
+      watchEffect(() => {
+         localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(config));
+      });
    });
 
-   const addFolder = (path: string) => {
-      folders.value.push(path);
-      localStorage.setItem(PREFIX + "folders", JSON.stringify(folders.value));
-   };
-
-   const removeFolder = (path: string) => {
-      folders.value = folders.value.filter((folder) => folder !== path);
-      localStorage.setItem(PREFIX + "folders", JSON.stringify(folders.value));
-   };
-
-   const updatePCSX2Path = (path: string) => {
-      localStorage.setItem(PREFIX + "pcsx2_path", path);
-      pcsx2Path.value = path;
-   };
-
    return {
-      folders,
-      pcsx2Path,
-      addFolder,
-      removeFolder,
-      updatePCSX2Path,
+      config,
    };
 });

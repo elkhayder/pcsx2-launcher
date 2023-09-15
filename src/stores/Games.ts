@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { onMounted, reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useConfigStore } from "./Config";
 import { invoke } from "@tauri-apps/api";
 import type { Game } from "../types.d.ts";
@@ -7,6 +7,8 @@ import GamesDB from "../assets/games_db.json";
 
 export const useGamesStore = defineStore("games", () => {
    const configStore = useConfigStore();
+
+   const config = computed(() => configStore.config);
 
    const games = reactive<Game[]>([]);
 
@@ -18,7 +20,7 @@ export const useGamesStore = defineStore("games", () => {
    const scan = async () => {
       games.length = 0;
 
-      for (const path of configStore.folders) {
+      for (const path of config.value.folders) {
          const x = (await invoke("read_directory_games", { path })) as Game[];
 
          x.forEach((game) => {
@@ -34,7 +36,7 @@ export const useGamesStore = defineStore("games", () => {
    };
 
    const play = async (game: Game) => {
-      if (!configStore.pcsx2Path) {
+      if (!config.value.pcsx2Path) {
          alert("PCSX2 location is not configured");
          return;
       }
@@ -46,7 +48,7 @@ export const useGamesStore = defineStore("games", () => {
       game.lastPlayed = new Date().toISOString();
 
       await invoke("launch_game", {
-         pcsx2Path: configStore.pcsx2Path,
+         pcsx2Path: config.value.pcsx2Path,
          isoPath: game.path,
       });
    };
