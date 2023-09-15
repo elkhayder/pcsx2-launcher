@@ -21,7 +21,6 @@ export const useConfigStore = defineStore("config", () => {
       if (!localStorage.getItem(LOCALSTORAGE_KEY)) {
          localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(config));
       } else {
-         console.log("Config store loaded from localStorage");
          Object.assign(
             config,
             JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY)!)
