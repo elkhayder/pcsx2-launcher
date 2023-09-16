@@ -1,6 +1,8 @@
 import { onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import GamepadHelper, { IGamepadButtonEventDetail } from "gamepad-helper";
+import { gamesPerRow } from "../helpers/screen";
+
 import { useGamesStore } from "./Games";
 
 const ButtonsMap = {
@@ -9,6 +11,7 @@ const ButtonsMap = {
    DPAD_LEFT: 14,
    DPAD_RIGHT: 15,
    A: 0,
+   B: 1,
 };
 
 export const useGamepadStore = defineStore("gamepad", () => {
@@ -36,6 +39,8 @@ export const useGamepadStore = defineStore("gamepad", () => {
          return true;
       }
 
+      const perRow = gamesPerRow();
+
       switch (clickedButton!) {
          case ButtonsMap.DPAD_RIGHT:
             if (selectedGameIndex.value >= gamesStore.games.length - 1) {
@@ -50,6 +55,25 @@ export const useGamepadStore = defineStore("gamepad", () => {
                selectedGameIndex.value = gamesStore.games.length - 1;
             } else {
                selectedGameIndex.value--;
+            }
+            return true;
+
+         case ButtonsMap.DPAD_DOWN:
+            if (
+               selectedGameIndex.value + perRow >=
+               gamesStore.games.length - 1
+            ) {
+               selectedGameIndex.value = 0;
+            } else {
+               selectedGameIndex.value += perRow;
+            }
+            return true;
+
+         case ButtonsMap.DPAD_UP:
+            if (selectedGameIndex.value - perRow <= 0) {
+               selectedGameIndex.value = gamesStore.games.length - 1;
+            } else {
+               selectedGameIndex.value -= perRow;
             }
             return true;
 
