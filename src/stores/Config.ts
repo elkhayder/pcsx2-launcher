@@ -16,7 +16,7 @@ export const useConfigStore = defineStore("config", () => {
       folders: [],
       pcsx2: {
          path: null,
-         flags: [],
+         flags: ["--nogui", "--fullscreen"],
       },
    });
 
