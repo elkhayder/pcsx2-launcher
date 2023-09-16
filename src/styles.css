@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 body {
-   @apply bg-zinc-900 text-white antialiased;
+   @apply relative bg-zinc-900 text-white antialiased;
 }
 
 .container {
@@ -13,5 +13,5 @@ body {
 }
 
 :root {
-   scrollbar-gutter: stable both-edges;
+   scrollbar-gutter: stable;
 }

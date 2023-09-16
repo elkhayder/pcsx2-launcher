@@ -9,16 +9,22 @@ import "./assets/fonts/Lato/stylesheet.css";
 import "./assets/fonts/RobotoMono/stylesheet.css";
 
 import App from "./App.vue";
-// Pages components
-import Home from "./pages/Home.vue";
-import Config from "./pages/Config.vue";
 
 const router = VueRouter.createRouter({
    // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-   history: VueRouter.createWebHashHistory(),
+   history: VueRouter.createWebHistory(),
    routes: [
-      { path: "/", component: Home },
-      { path: "/config", component: Config },
+      { path: "/", component: () => import("./pages/Home.vue"), name: "Home" },
+      {
+         path: "/Config",
+         component: () => import("./pages/Config.vue"),
+         name: "Config",
+      },
+      {
+         path: "/GameSettings/:serial",
+         component: () => import("./pages/GameSettings.vue"),
+         name: "GameSettings",
+      },
    ],
 });
 

@@ -7,10 +7,10 @@
          <nav>
             <ul class="flex items-center space-x-4">
                <li>
-                  <router-link to="/">Home</router-link>
+                  <router-link :to="{ name: 'Home' }">Home</router-link>
                </li>
                <li>
-                  <router-link to="/config">Config</router-link>
+                  <router-link :to="{ name: 'Config' }">Config</router-link>
                </li>
             </ul>
          </nav>
