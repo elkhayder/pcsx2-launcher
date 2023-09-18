@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Game, useGamesStore } from "../stores/Games";
 import { useGamepadStore } from "../stores/Gamepad";

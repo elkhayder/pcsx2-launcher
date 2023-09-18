@@ -21,7 +21,12 @@
             "exists": true,
             "readFile": true,
             "writeFile": true,
-            "scope": ["$APPDATA/*"]
+            "createDir": true,
+
+            "scope": ["$APPDATA", "$APPDATA/**"]
+         },
+         "path": {
+            "all": true
          }
       },
       "bundle": {
@@ -34,7 +39,8 @@
             "icons/128x128@2x.png",
             "icons/icon.icns",
             "icons/icon.ico"
-         ]
+         ],
+         "publisher": "EL KHAYDER"
       },
       "security": {
          "csp": null
