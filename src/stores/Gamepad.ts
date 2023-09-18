@@ -78,7 +78,7 @@ export const useGamepadStore = defineStore("gamepad", () => {
             return true;
 
          case ButtonsMap.A:
-            gamesStore.play(gamesStore.games[selectedGameIndex.value]);
+            gamesStore.play(gamesStore.filteredGames[selectedGameIndex.value]);
             return true;
 
          default:

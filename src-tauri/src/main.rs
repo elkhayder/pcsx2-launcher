@@ -89,16 +89,18 @@ fn read_directory_games(path: &str) -> Result<Vec<Game>, String> {
 }
 
 #[tauri::command]
-fn launch_game(pcsx2_path: &str, iso_path: &str) {
+fn launch_game(pcsx2_path: &str, iso_path: &str, flags: Vec<String>, game_args: Option<String>) {
     use std::process::{Command, Stdio};
 
     let mut process = Command::new(pcsx2_path);
 
+    process.arg(iso_path).args(flags.as_slice());
+
+    if let Some(args) = game_args {
+        process.arg(format!("--gameargs=\"{}\"", args));
+    }
+
     process
-        .arg(iso_path)
-        .arg("--fullscreen")
-        .arg("--nogui")
-        // .arg("--portable")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()

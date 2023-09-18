@@ -3,6 +3,12 @@ import { computed, onMounted, reactive, ref, watchEffect } from "vue";
 import { useConfigStore } from "./Config";
 import { invoke } from "@tauri-apps/api";
 import GamesDB from "../assets/games_db.json";
+import {
+   BaseDirectory,
+   exists,
+   readBinaryFile,
+   writeBinaryFile,
+} from "@tauri-apps/api/fs";
 
 export type OrderBy = "lastPlayed" | "name";
 
@@ -11,7 +17,9 @@ export type Game = {
    path: string;
    extra: {
       name?: string;
-      lastPlayed: string | null; // ISO formatted
+      args?: string;
+      cover?: string | null;
+      lastPlayed?: string; // ISO formatted
    };
 };
 
@@ -66,16 +74,18 @@ export const useGamesStore = defineStore("games", () => {
       // This is initiated here instead of in the reactive declaration
       // because we don't want to trigger a write to localStorage on
       // initialization
-      watchEffect(() => {
-         localStorage.setItem(
-            LOCALSTORAGE_KEY,
-            JSON.stringify(
-               Object.fromEntries(
-                  games.map((x) => [x.serial, x.extra])
-               ) as Record<string, Game["extra"]>
-            )
-         );
-      });
+      setTimeout(() => {
+         watchEffect(() => {
+            const extra = Object.fromEntries(
+               games.map((x) => {
+                  const { cover, ...rest } = x.extra;
+                  return [x.serial, rest];
+               })
+            );
+
+            localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(extra));
+         });
+      }, 2000);
    });
 
    const scan = async () => {
@@ -87,14 +97,17 @@ export const useGamesStore = defineStore("games", () => {
 
       for (const path of config.value.folders) {
          const x = (await invoke("read_directory_games", { path })) as Game[];
+         games.push(...x);
 
-         x.forEach((game) => {
-            game.extra = gamesConfigs[game.serial] ?? { lastPlayed: null };
+         for (let i = 0; i < games.length; i++) {
+            const game = games[i];
+
+            game.extra = gamesConfigs[game.serial] ?? {};
 
             game.extra.name ??= (GamesDB as any)[game.serial];
-         });
 
-         games.push(...x);
+            cover.get(game);
+         }
       }
    };
 
@@ -109,7 +122,42 @@ export const useGamesStore = defineStore("games", () => {
       await invoke("launch_game", {
          pcsx2Path: config.value.pcsx2.path,
          isoPath: game.path,
+         flags: config.value.pcsx2.flags,
+         gamesArgs: game.extra.args,
       });
+   };
+
+   const cover = {
+      async get(game: Game) {
+         const r = await exists(game.serial, { dir: BaseDirectory.AppData });
+
+         if (!r) {
+            this.default(game);
+         } else {
+            const content = await readBinaryFile(game.serial, {
+               dir: BaseDirectory.AppData,
+            });
+
+            game.extra.cover = URL.createObjectURL(new Blob([content.buffer]));
+         }
+      },
+
+      async default(game: Game) {
+         try {
+            const request = await fetch(
+               `https://raw.githubusercontent.com/xlenore/ps2-covers/main/covers/${game.serial}.jpg`
+            );
+            const blob = await request.blob();
+
+            await writeBinaryFile(game.serial, await blob.arrayBuffer(), {
+               dir: BaseDirectory.AppData,
+            });
+
+            game.extra.cover = URL.createObjectURL(blob);
+         } catch {
+            game.extra.cover = null;
+         }
+      },
    };
 
    return {
@@ -117,6 +165,7 @@ export const useGamesStore = defineStore("games", () => {
       orderBy,
       searchKeyword,
       filteredGames,
+      cover,
       scan,
       play,
    };

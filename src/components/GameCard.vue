@@ -47,13 +47,19 @@ watchEffect(() => {
 <template>
    <button
       @dblclick="() => gamesStore.play(game)"
-      class="rounded-md transition-all outline-none duration-300 bg-zinc-900 focus:bg-zinc-700 focus:scale-110"
+      class="rounded-md transition-all outline-none duration-100 bg-zinc-900 focus:bg-zinc-700 focus:scale-110"
       ref="buttonRef"
    >
       <div class="overflow-hidden p-2 pb-3">
          <GameImage :game="game" />
-
-         <h2 class="my-2 truncate">{{ game.extra.name ?? game.serial }}</h2>
+         <h2
+            class="my-2 truncate"
+            :class="{
+               'text-red-400': !game.extra.name,
+            }"
+         >
+            {{ game.extra.name ?? game.serial }}
+         </h2>
          <h3 class="text-xs text-gray-400">
             Last played:
             <template v-if="game.extra.lastPlayed">

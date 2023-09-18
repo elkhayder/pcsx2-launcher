@@ -3,7 +3,9 @@
 <template>
    <header class="mt-2">
       <div class="container h-20 flex items-center justify-between">
-         <img src="../assets/ps2-icon.png" alt="PS2 Icon" class="h-12" />
+         <router-link :to="{ name: 'Home' }">
+            <img src="../assets/ps2-icon.png" alt="PS2 Icon" class="h-12" />
+         </router-link>
          <nav>
             <ul class="flex items-center space-x-4">
                <li>

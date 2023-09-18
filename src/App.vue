@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import Header from "./components/Header.vue";
+import { useGamesStore } from "./stores/Games";
+import { useConfigStore } from "./stores/Config";
+import { useGamepadStore } from "./stores/Gamepad";
 // import GameCard from "./components/GameCard.vue";
 // import ReadDirectory from "./components/ReadDirectory.vue";
 
@@ -9,6 +12,11 @@ onMounted(() => {
       e.preventDefault();
    });
 });
+
+// Load all stores
+useGamesStore();
+useConfigStore();
+useGamepadStore();
 </script>
 
 <template>

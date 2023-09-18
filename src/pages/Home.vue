@@ -52,13 +52,4 @@ const gamesStore = useGamesStore();
    </div>
 </template>
 
-<style lang="scss" scoped>
-label {
-   @apply block mb-2 text-sm font-medium text-white;
-}
-
-input,
-select {
-   @apply bg-gray-50 border text-sm rounded-lg block w-full px-2.5 py-1.5 dark:bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500;
-}
-</style>
+<style lang="scss" scoped></style>

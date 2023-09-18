@@ -16,6 +16,12 @@
          "dialog": {
             "open": true,
             "message": true
+         },
+         "fs": {
+            "exists": true,
+            "readFile": true,
+            "writeFile": true,
+            "scope": ["$APPDATA/*"]
          }
       },
       "bundle": {
