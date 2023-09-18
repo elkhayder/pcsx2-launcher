@@ -3,10 +3,6 @@ on:
    push:
       branches:
          - release
-      paths-ignore:
-         - "**"
-      tags:
-         - "V-*"
 
 jobs:
    publish-tauri:
